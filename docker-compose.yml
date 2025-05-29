@@ -1,16 +1,30 @@
 version: '3.8'
+
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/google-credentials.json
     volumes:
-      - ./backend/google-credentials.json:/app/google-credentials.json:ro
-  frontend:
-    build: ./frontend
-    ports:
-      - "4200:4200"
-    depends_on:
-      - backend 
+      - ./backend/uploads:/app/uploads
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge 
